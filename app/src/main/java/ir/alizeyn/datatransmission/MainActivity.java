@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,12 +14,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int ACTIVITY_CHOOSE_FILE = 1002;
+    private static final String TAG = MainActivity.class.getName();
 
     @BindView(R.id.llFileDetails)
     LinearLayout llFileDetails;
@@ -77,6 +84,16 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, fileUri.toString(), Toast.LENGTH_SHORT).show();
                     tvFileName.setText(fileUri.getLastPathSegment());
                     llFileDetails.setVisibility(View.VISIBLE);
+
+                    try {
+                        InputStream inputStream = getContentResolver().openInputStream(fileUri);
+                        if (inputStream != null) {
+                            String fileContent = IOUtils.toString(inputStream, "UTF-8");
+                            Log.i(TAG, "onActivityResult: " + fileContent);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
