@@ -1,8 +1,6 @@
 package ir.alizeyn.datatransmission;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,21 +8,7 @@ import java.util.zip.CRC32;
 
 public class Opration {
 
-
-    private static String readFile() throws FileNotFoundException, IOException {
-        String fileName = "./src.txt";
-        File file = new File(fileName);
-
-        try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            int singleCharInt;
-            String src = "";
-            while((singleCharInt = fileInputStream.read()) != -1) {
-                src += String.format("%8s", Integer.toBinaryString(singleCharInt)).replace(' ', '0');
-            }
-            return src;
-        }
-    }
-    private static byte[] toByteArray(String input){
+    public static byte[] toByteArray(String input){
         for (int i = 0; i < input.length()%8; i++) {
             input += '0';
         }
@@ -37,21 +21,21 @@ public class Opration {
         }
         return byteArray;
     }
-    private static int[] toIntArray(String input){
+    public static int[] toIntArray(String input){
         int[] intArray = new int[input.length()];
         for(int i=0; i<input.length(); i+=1) {
             intArray[i] = Integer.parseInt(input.substring(i, i+1));
         }
         return intArray;
     }
-    private static String toString(int[] input){
+    public static String toString(int[] input){
         String output = "" ;
         for (int i = 0; i < input.length; i++) {
             output += String.valueOf(input[i]);
         }
         return output;
     }
-    private static void writeFile(byte[] data) {
+    public static void writeFile(byte[] data) {
         OutputStream os = null;
         try {
             os = new FileOutputStream(new File("./des.txt"));
@@ -68,7 +52,7 @@ public class Opration {
     }
 
     // 1. Coding Functions
-    private static String enocdeByHDB3(String input){
+    public static String enocdeByHDB3(String input){
         int previusePulseSign = -1;
         int pulseCounter = 0;
         String output = "";
@@ -108,7 +92,7 @@ public class Opration {
         return output;
 
     }
-    private static String encodeByB8ZS(String input){
+    public static String encodeByB8ZS(String input){
         int previusePulseSign = -1;
         String output = "";
         int index = 0;
@@ -135,7 +119,7 @@ public class Opration {
         }
         return output;
     }
-    private static String decodeFromHDB3(String input){
+    public static String decodeFromHDB3(String input){
         int previusePulseSign = -1;
         String output = "";
         int index = 0;
@@ -161,7 +145,7 @@ public class Opration {
 
         return output;
     }
-    private static String decodeFromB8ZS(String input){
+    public static String decodeFromB8ZS(String input){
         int previusePulseSign = -1;
         String output = "";
         int index = 0;
@@ -188,25 +172,25 @@ public class Opration {
 
     // 2. Error Detection Functions
     // use to generate CRC32 bit value , add this to begining of data must save in file
-    private static String getCRC32Value(String input){
+    public static String getCRC32Value(String input){
         byte[] byteArray = toByteArray(input);
         CRC32 CRCGenerator = new CRC32();
         CRCGenerator.update(byteArray);
         return String.format("%32s", Long.toBinaryString(CRCGenerator.getValue())).replace(' ', '0');
     }
     // the data you saved, with 32 bit CRC32 in first , check for error
-    private static boolean verifyCRC32Value (String input){
+    public static boolean verifyCRC32Value (String input){
         String CRC32Received = input.substring(0, 32);
         String data = input.substring(32);
         return (getCRC32Value(data).equals(CRC32Received));
     }
     // remove CRC32 bit from the begining of data
-    private static String removeCRC32Value(String input) {
+    public static String removeCRC32Value(String input) {
         return input.substring(32);
     }
 
     // use to encode hamming
-    static String encodeHamming(String input){
+    public static String encodeHamming(String input){
         String output = "";
         for (int i = 0; i < input.length(); i+=2) {
             int a[] = toIntArray(input.substring(i, i+2));
@@ -218,7 +202,7 @@ public class Opration {
     }
 
     // use to decode hamming + auto correction ;)
-    static String correctHammingOrginalData(String input){
+    public static String correctHammingOrginalData(String input){
         String output = "";
         char[] temp;
         for (int i = 0; i < input.length(); i+=5) {
@@ -230,7 +214,7 @@ public class Opration {
     }
 
     // hamming helper functions
-    static int[] generateCode(int a[]) {
+    public static int[] generateCode(int a[]) {
         int b[];
         int i=0, parity_count=0 ,j=0, k=0;
         while(i < a.length) {
@@ -256,7 +240,7 @@ public class Opration {
         }
         return b;
     }
-    static int getParity(int b[], int power) {
+    public static int getParity(int b[], int power) {
         int parity = 0;
         for(int i=0 ; i < b.length ; i++) {
             if(b[i] != 2) {
@@ -281,7 +265,7 @@ public class Opration {
         }
         return parity;
     }
-    static String receive(int a[]) {
+    public static String receive(int a[]) {
         int power;
         int parity_count = 3;
         // int parity[] = new int[parity_count];
@@ -315,5 +299,61 @@ public class Opration {
         }
         return output;
     }
+    public static String encodeASK(String input){
+        String output = "2";
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '0')
+                output += "32123212";
+            else
+                output += "42024202";
+        }
+
+        return output;
+    }
+
+    public static String encodeFSK (String input){
+        String output = "|";
+
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '0')
+                output += "121012101|";
+            else
+                output += "12101210121012101|";
+        }
+
+        return output;
+    }
+
+    public static String decodeFSK (String input){
+        String output = "";
+        int i = 0;
+        while (i < input.length()-1){
+
+            if (input.charAt(i+10) == '|'){
+                output += "0";
+                i+= 10;
+            }
+            else{
+                output += "1";
+                i += 18;
+            }
+        }
+        return output;
+    }
+
+
+
+    public static String decodeASK (String input) {
+        String output = "";
+        input = input.replace("2", "");
+        for (int i = 0; i < input.length(); i+=4) {
+            if (input.charAt(i) == '3')
+                output += "0";
+            else
+                output += "1";
+        }
+        return output;
+    }
+
 
 }

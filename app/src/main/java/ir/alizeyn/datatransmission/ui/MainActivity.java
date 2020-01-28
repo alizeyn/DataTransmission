@@ -1,4 +1,4 @@
-package ir.alizeyn.datatransmission;
+package ir.alizeyn.datatransmission.ui;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +21,9 @@ import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.alizeyn.datatransmission.Opration;
+import ir.alizeyn.datatransmission.R;
+import ir.alizeyn.datatransmission.Util;
 import ir.alizeyn.datatransmission.model.Coding;
 import ir.alizeyn.datatransmission.model.DeModulation;
 import ir.alizeyn.datatransmission.model.ErrorDetection;
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout llFileDetails;
     @BindView(R.id.tvFileName)
     TextView tvFileName;
+    @BindView(R.id.tvLog)
+    TextView tvLog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,47 +77,113 @@ public class MainActivity extends AppCompatActivity {
 
     public void startProcess(View view) {
 
+        tvLog.setText("");
+        String encodingData = src;
+
+        if (encodingData == null) {
+            Toast.makeText(this, "Select input file frist!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String initLog = "Input -> " + encodingData + "\n\n";
+        tvLog.append(initLog);
+
+        if (process == Process.ENCODE) {
+
+            if (coding == Coding.HDB3) {
+                encodingData = Opration.enocdeByHDB3(encodingData);
+            } else {
+                encodingData = Opration.encodeByB8ZS(encodingData);
+            }
+            String encodeLog = "Encoded -> " + encodingData + "\n\n";
+            tvLog.append(encodeLog);
+
+            if (errorDetection == ErrorDetection.CRC) {
+                encodingData = Opration.getCRC32Value(encodingData);
+            } else {
+                encodingData = Opration.encodeHamming(encodingData);
+            }
+            String decodeLog = "Code Word -> " + encodingData + "\n\n";
+            tvLog.append(decodeLog);
+
+            if (deModulation == DeModulation.ASK) {
+                encodingData = Opration.encodeASK(encodingData);
+            } else {
+                encodingData = Opration.encodeFSK(encodingData);
+            }
+            String demodulationLog = "Demodulation Encode -> " + encodingData + "\n\n";
+            tvLog.append(demodulationLog);
+
+        } else {
+
+            if (coding == Coding.HDB3) {
+                encodingData = Opration.decodeFromHDB3(encodingData);
+            } else {
+                encodingData = Opration.decodeFromB8ZS(encodingData);
+            }
+            String decodeLog = "Decoded -> " + encodingData + "\n\n";
+            tvLog.append(decodeLog);
+
+            if (errorDetection == ErrorDetection.CRC) {
+                String errDetectionMsg;
+                if (Opration.verifyCRC32Value(encodingData)) {
+                    errDetectionMsg = "startProcess: CRC NO ERROR\n\n";
+                } else {
+                    errDetectionMsg = "startProcess: CRC *ERROR*\n\n";
+                }
+                tvLog.append(errDetectionMsg);
+
+                encodingData = Opration.removeCRC32Value(encodingData);
+            } else {
+                encodingData = Opration.correctHammingOrginalData(encodingData);
+            }
+            String crcLog = "Data Word -> " + encodingData + "\n\n";
+            tvLog.append(crcLog);
+
+            if (deModulation == DeModulation.ASK) {
+                encodingData = Opration.decodeASK(encodingData);
+            } else {
+                encodingData = Opration.decodeFSK(encodingData);
+            }
+            String demoduleDecodeLog = "Demodulation Decode -> " + encodingData + "\n\n";
+            tvLog.append(demoduleDecodeLog);
+        }
+
     }
 
     //<editor-fold desc="Select Methods">
-    public void selectDemodulationMethod(View view) {
-        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
-
-        if (selectedId == R.id.rbAsk) {
-            deModulation = DeModulation.ASK;
-        } else {
-            deModulation = DeModulation.FSK;
-        }
+    public void selectDemodulationMethodASK(View view) {
+        deModulation = DeModulation.FSK;
     }
 
-    public void selectErrorDetectionMethod(View view) {
-        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
+    public void selectDemodulationMethodFSK(View view) {
+        deModulation = DeModulation.FSK;
+    }
 
-        if (selectedId == R.id.rbCrc) {
+    public void selectErrorDetectionMethodCRC(View view) {
             errorDetection = ErrorDetection.CRC;
-        } else {
+    }
+
+    public void selectErrorDetectionMethodHamming(View view) {
             errorDetection = ErrorDetection.HAMMING;
-        }
     }
 
-    public void selectCodingMethod(View view) {
-        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
+    public void selectCodingMethodHDB3(View view) {
 
-        if (selectedId == R.id.rbHdb3) {
             coding = Coding.HDB3;
-        } else {
-            coding = Coding.B8ZS;
-        }
     }
 
-    public void selectProcess(View view) {
-        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
+    public void selectCodingMethodB8ZS(View view) {
 
-        if (selectedId == R.id.rbEncode) {
+            coding = Coding.B8ZS;
+    }
+
+    public void selectProcessEncode(View view) {
             process = Process.ENCODE;
-        } else {
+    }
+
+    public void selectProcessDecode(View view) {
             process = Process.DECODE;
-        }
     }
     //</editor-fold>
 
@@ -146,6 +216,10 @@ public class MainActivity extends AppCompatActivity {
                         InputStream inputStream = getContentResolver().openInputStream(fileUri);
                         if (inputStream != null) {
                             String fileContent = IOUtils.toString(inputStream, "UTF-8");
+                            for (Character c :
+                                    fileContent.toCharArray()) {
+                                fileContent += String.format("%8s", Integer.toBinaryString(c)).replace(' ', '0');
+                            }
                             src = fileContent;
                             Log.i(TAG, "onActivityResult: " + fileContent);
                         }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -122,7 +122,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="selectProcess"
                     android:orientation="horizontal">
 
                     <RadioButton
@@ -130,6 +129,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="8dp"
+                        android:onClick="selectProcessEncode"
                         android:checked="true"
                         android:text="Encode" />
 
@@ -137,6 +137,7 @@
                         android:id="@+id/rbDecode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:onClick="selectProcessDecode"
                         android:text="Decode" />
 
                 </RadioGroup>
@@ -169,7 +170,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="selectCodingMethod"
                     android:orientation="horizontal">
 
                     <RadioButton
@@ -178,12 +178,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="19dp"
                         android:checked="true"
+                        android:onClick="selectCodingMethodHDB3"
                         android:text="HDB3" />
 
                     <RadioButton
                         android:id="@+id/rbB8zs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:onClick="selectCodingMethodB8ZS"
                         android:text="B8ZS" />
 
                 </RadioGroup>
@@ -217,7 +219,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="selectErrorDetectionMethod"
                     android:orientation="horizontal">
 
                     <RadioButton
@@ -226,12 +227,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="28dp"
                         android:checked="true"
+                        android:onClick="selectErrorDetectionMethodCRC"
                         android:text="CRC" />
 
                     <RadioButton
                         android:id="@+id/rbHamming"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:onClick="selectErrorDetectionMethodHamming"
                         android:text="Hamming" />
 
                 </RadioGroup>
@@ -265,7 +268,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="selectDemodulationMethod"
                     android:orientation="horizontal">
 
                     <RadioButton
@@ -274,12 +276,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="28dp"
                         android:checked="true"
+                        android:onClick="selectDemodulationMethodASK"
                         android:text="ASK" />
 
                     <RadioButton
                         android:id="@+id/rbFsk"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:onClick="selectDemodulationMethodFSK"
                         android:text="FSK" />
 
                 </RadioGroup>
@@ -293,9 +297,15 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginTop="42dp"
                 android:layout_marginRight="32dp"
-                android:onClick="startProcess"
                 android:gravity="center"
+                android:onClick="startProcess"
                 android:text="start" />
+
+
+            <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>
