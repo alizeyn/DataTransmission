@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,15 +22,25 @@ import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.alizeyn.datatransmission.model.Coding;
+import ir.alizeyn.datatransmission.model.DeModulation;
+import ir.alizeyn.datatransmission.model.ErrorDetection;
+import ir.alizeyn.datatransmission.model.Process;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int ACTIVITY_CHOOSE_FILE = 1002;
     private static final String TAG = MainActivity.class.getName();
 
+    private String src;
+
+    private Process process = Process.ENCODE;
+    private Coding coding = Coding.HDB3;
+    private ErrorDetection errorDetection = ErrorDetection.CRC;
+    private DeModulation deModulation = DeModulation.ASK;
+
     @BindView(R.id.llFileDetails)
     LinearLayout llFileDetails;
-
     @BindView(R.id.tvFileName)
     TextView tvFileName;
 
@@ -60,6 +71,52 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void startProcess(View view) {
+
+    }
+
+    //<editor-fold desc="Select Methods">
+    public void selectDemodulationMethod(View view) {
+        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
+
+        if (selectedId == R.id.rbAsk) {
+            deModulation = DeModulation.ASK;
+        } else {
+            deModulation = DeModulation.FSK;
+        }
+    }
+
+    public void selectErrorDetectionMethod(View view) {
+        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
+
+        if (selectedId == R.id.rbCrc) {
+            errorDetection = ErrorDetection.CRC;
+        } else {
+            errorDetection = ErrorDetection.HAMMING;
+        }
+    }
+
+    public void selectCodingMethod(View view) {
+        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
+
+        if (selectedId == R.id.rbHdb3) {
+            coding = Coding.HDB3;
+        } else {
+            coding = Coding.B8ZS;
+        }
+    }
+
+    public void selectProcess(View view) {
+        int selectedId = ((RadioGroup)view).getCheckedRadioButtonId();
+
+        if (selectedId == R.id.rbEncode) {
+            process = Process.ENCODE;
+        } else {
+            process = Process.DECODE;
+        }
+    }
+    //</editor-fold>
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
@@ -89,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         InputStream inputStream = getContentResolver().openInputStream(fileUri);
                         if (inputStream != null) {
                             String fileContent = IOUtils.toString(inputStream, "UTF-8");
+                            src = fileContent;
                             Log.i(TAG, "onActivityResult: " + fileContent);
                         }
                     } catch (IOException e) {

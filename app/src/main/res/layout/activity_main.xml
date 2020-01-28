@@ -118,12 +118,15 @@
 
 
                 <RadioGroup
+                    android:id="@+id/rgProcess"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="selectProcess"
                     android:orientation="horizontal">
 
                     <RadioButton
+                        android:id="@+id/rbEncode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="8dp"
@@ -131,6 +134,7 @@
                         android:text="Encode" />
 
                     <RadioButton
+                        android:id="@+id/rbDecode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Decode" />
@@ -161,12 +165,15 @@
                     android:text="Coding Method" />
 
                 <RadioGroup
+                    android:id="@+id/rgCoding"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="selectCodingMethod"
                     android:orientation="horizontal">
 
                     <RadioButton
+                        android:id="@+id/rbHdb3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="19dp"
@@ -174,6 +181,7 @@
                         android:text="HDB3" />
 
                     <RadioButton
+                        android:id="@+id/rbB8zs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="B8ZS" />
@@ -205,12 +213,15 @@
                     android:text="Error Detection Method" />
 
                 <RadioGroup
+                    android:id="@+id/rgError"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="selectErrorDetectionMethod"
                     android:orientation="horizontal">
 
                     <RadioButton
+                        android:id="@+id/rbCrc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="28dp"
@@ -218,6 +229,7 @@
                         android:text="CRC" />
 
                     <RadioButton
+                        android:id="@+id/rbHamming"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Hamming" />
@@ -249,12 +261,15 @@
                     android:text="Demodulation Method" />
 
                 <RadioGroup
+                    android:id="@+id/rgDemodulation"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="selectDemodulationMethod"
                     android:orientation="horizontal">
 
                     <RadioButton
+                        android:id="@+id/rbAsk"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="28dp"
@@ -262,6 +277,7 @@
                         android:text="ASK" />
 
                     <RadioButton
+                        android:id="@+id/rbFsk"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="FSK" />
@@ -277,6 +293,7 @@
                 android:layout_marginLeft="32dp"
                 android:layout_marginTop="42dp"
                 android:layout_marginRight="32dp"
+                android:onClick="startProcess"
                 android:gravity="center"
                 android:text="start" />
 
